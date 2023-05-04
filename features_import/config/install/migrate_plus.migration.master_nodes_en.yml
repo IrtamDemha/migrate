@@ -1,0 +1,96 @@
+langcode: fr
+id: master_nodes_en
+migration_tags: null
+migration_group: null
+label: 'Import master  liste'
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: json
+  constants:
+    diplome: 'Master'
+    langcode: en
+
+  urls:
+    - https://api.copernic.xxx.xxx
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+
+    - name: libRof
+      label: 'libRof'
+      selector: /elemFormJson/libelle/libelleParLangue/0/libelle
+
+    - name: lang
+      label: 'lang'
+      selector: /elemFormJson/libelle/libelleParLangue/0/codLangueAppli/codLangue
+
+    - name: anne
+      label: 'anne'
+      selector: /elemFormJson/niveauDiplome/codNivDip
+    -
+      name: elfPj
+      label: 'elfPj'
+      selector: /elemFormJson/elfPj
+
+    - name: codRof
+      label: 'codRof'
+      selector: /elemFormJson/codRof
+
+    - name: publish
+      label: 'publish'
+      selector: /elemFormJson/publieWeb/libPublieWeb
+  ids:
+    codRof:
+      type: string
+
+process:
+
+  nid:
+    - plugin: migration_lookup
+      migration: master_nodes
+      source: codRof
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+
+
+  langcode: constants/langcode
+
+  title:
+   plugin: title_prefix
+   source:
+    - libRof
+    - anne
+
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: parcour
+  translations: true
+  overwrite_properties:
+    - title
+

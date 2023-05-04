@@ -1,0 +1,69 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: module_master_en
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  constants:
+    langcode: en
+  directory: private://sphinx_en/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - bloc_UE
+    - code_bloc
+
+  keys:
+    code_bloc:
+      type: string
+
+process:
+
+  nid:
+    - plugin: skip_on_empty
+      method: row
+      source: code_bloc
+    - plugin: migration_lookup
+      migration: module_master
+      source: code_bloc
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+
+
+  langcode: constants/langcode
+  
+  title:
+    plugin: substr_and_elipsis
+    source: bloc_UE
+    start: 0
+    length: 254
+
+  field_external_id: code_bloc
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: program
+  translations: true
+  overwrite_properties:
+    - title
+
+migration_dependencies:
+  require:
+    - module_master
+
+
+

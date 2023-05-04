@@ -1,0 +1,154 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: mentions_nodes_update
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_fr/input/
+  worksheet: infos_mentions
+  origin: A2
+  header_row: 1
+  columns:
+    - code_me
+    - pre_requis_mention
+    - obj_peda_mention
+    - profil_sortie_mention
+    - passerelles_possibles_mention
+    - partenaires_academiques
+    - competences_mention_1
+    - competences_mention_2
+    - competences_mention_3
+    - competences_mention_4
+    - competences_mention_5
+    - competences_mention_6
+
+
+  keys:
+    code_me:
+      type: string
+
+process:
+
+  nid:
+    -
+      plugin: skip_on_empty
+      method: row
+      source: code_me
+    -
+      plugin: migration_lookup
+      migration: mentions_nodes
+      source: code_me
+      no_stub: true
+    -
+      plugin: skip_on_empty
+      method: row
+
+  competences:
+    plugin: toArray
+    source:
+      - competences_mention_1
+      - competences_mention_2
+      - competences_mention_3
+      - competences_mention_4
+      - competences_mention_5
+      - competences_mention_6
+
+
+
+
+  field_competences:
+    - plugin: iterator
+      source: '@competences'
+      process:
+        value:
+          - plugin: trim_and_skip_on_empty
+            method: process
+            source: texte
+          - plugin: upper_point
+          - plugin: callback
+            callable: _filter_autop
+          - plugin: filter_url
+
+        format:
+          plugin: default_value
+          default_value: "basic_html"
+
+  field_prerequis/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: pre_requis_mention
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_prerequis/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  field_objectives/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: obj_peda_mention
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+
+  field_objectives/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_public_target/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: profil_sortie_mention
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_public_target/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  field_requirement/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: pre_requis_mention
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_requirement/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_passerelles/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: passerelles_possibles_mention
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_passerelles/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  field_partner/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: partenaires_academiques
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_partner/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: training
+
+

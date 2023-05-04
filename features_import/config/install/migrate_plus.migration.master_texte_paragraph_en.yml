@@ -1,0 +1,163 @@
+langcode: fr
+id: master_texte_paragraph_en
+migration_tags: null
+migration_group: null
+label: 'Import mention en'
+source:
+  plugin: customspreadSheet
+  constants:
+    lang: English
+    langcode: en
+  default_lang: true
+  directory: private://sphinx_en/input/
+  worksheet: infos_elf
+  origin: A2
+  header_row: 1
+  columns:
+    - code_pr
+    - pre_requis_elf
+    - profil_sortie_elf
+    - obj_peda_elf
+    - debouches_elf
+    - competences_elf_1
+    - competences_elf_2
+    - competences_elf_3
+    - competences_elf_4
+    - competences_elf_5
+    - competences_elf_6
+    - laboratoires_ids_elf
+    - laboratoires_ids_elf_autre
+    - relations_socioeconomiques_elf
+
+
+  keys:
+    code_pr:
+      type: string
+
+
+process:
+
+  nid:
+    -
+      plugin: migration_lookup
+      migration: master_nodes
+      source: code_pr
+      no_stub: true
+    -
+      plugin: skip_on_empty
+      method: row
+
+  langcode: constants/langcode
+
+  field_relation/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: relations_socioeconomiques_elf
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_relation/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  field_objectives/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: obj_peda_elf
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_objectives/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+
+  field_opportunities/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: debouches_elf
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_opportunities/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  field_profile/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: profil_sortie_elf
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_profile/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_requirement : pre_requis_elf
+  competences:
+    plugin: toArray
+    source:
+      - competences_elf_1
+      - competences_elf_2
+      - competences_elf_3
+      - competences_elf_4
+      - competences_elf_5
+      - competences_elf_6
+
+  field_competences:
+    -
+      plugin: iterator
+      source: '@competences'
+      process:
+        value:
+          -
+            plugin: trim_and_skip_on_empty
+            method: process
+            source: texte
+          -
+            plugin: upper_point
+          -
+            plugin: callback
+            callable: _filter_autop
+          -
+            plugin: filter_url
+
+        format:
+          plugin: default_value
+          default_value: "basic_html"
+
+  laboratoires:
+    plugin: toArray
+    source:
+      - laboratoires_ids_elf
+      - laboratoires_ids_elf_autre
+
+  field_laboratoires:
+    -
+      plugin: iterator
+      source: '@laboratoires'
+      process:
+        value:
+          -
+            plugin: trim_and_skip_on_empty
+            method: process
+            source: texte
+          - plugin: upper_point
+          -
+            plugin: callback
+            callable: _filter_autop
+
+          - plugin: filter_url
+
+        format:
+          plugin: default_value
+          default_value: "basic_html"
+destination:
+  plugin: entity:node
+  default_bundle: course
+  translations: true
+

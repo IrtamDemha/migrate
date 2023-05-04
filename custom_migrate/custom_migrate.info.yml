@@ -1,0 +1,5 @@
+name: 'custom_migrate'
+type: module
+description: 'Migrate useful pugins'
+core: 8.x
+package: 'Custom'

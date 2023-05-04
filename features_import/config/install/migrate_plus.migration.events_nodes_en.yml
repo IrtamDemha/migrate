@@ -1,0 +1,246 @@
+langcode: fr
+id: events_nodes_en
+migration_tags: null
+migration_group: null
+label: 'Import nodes events'
+source:
+  plugin: url
+  data_fetcher_plugin: file
+  # Choose one data parser.
+  data_parser_plugin: json_indexed
+  urls:
+    - https://xxx.xxx.xxx
+  item_selector: events
+  fields:
+    - name: originalImage
+      label: 'Image original'
+      selector: originalImage
+    - name: title
+      label: 'Alt'
+      selector: title
+    - name: id
+      label: 'id'
+      selector: uid
+    - name: tags
+      label: 'tags'
+      selector: tags
+    - name: tagGroups
+      label: 'tag Groups'
+      selector: tagGroups
+    - name: html
+      label: 'introduction '
+      selector: html
+    - name: description
+      label: 'introduction '
+      selector: description
+    - name: conditions
+      label: 'introduction '
+      selector: conditions
+    - name: description
+      label: 'introduction '
+      selector: description
+    - name: registrationUrl
+      label: 'introduction '
+      selector: registrationUrl
+    - name: address
+      label: 'address '
+      selector: address
+    - name: postalCode
+      label: 'postalCode '
+      selector: postalCode
+    - name: city
+      label: 'city '
+      selector: city
+    - name: department
+      label: 'department '
+      selector: department
+    - name: region
+      label: 'region '
+      selector: region
+    - name: latitude
+      label: 'latitude '
+      selector: latitude
+    - name: longitude
+      label: 'longitude '
+      selector: longitude
+    - name: firstDate
+      label: 'firstDate '
+      selector: firstDate
+    - name: firstTimeEnd
+      label: 'firstTimeEnd '
+      selector: firstTimeEnd
+    - name: firstTimeStart
+      label: 'firstTimeStart '
+      selector: firstTimeStart
+    - name: lastTimeStart
+      label: 'lastTimeStart '
+      selector: lastTimeStart
+    - name: lastTimeEnd
+      label: 'lastTimeEnd '
+      selector: lastTimeEnd
+    - name: lastDate
+      label: 'lastDate '
+      selector: lastDate
+    - name: range
+      label: 'range '
+      selector: range
+    - name: featured
+      label: 'featured '
+      selector: featured
+  ids:
+    id:
+      type: string
+  constants:
+    lang: English
+    langcode: en
+process:
+  nid:
+    - 
+      plugin: migration_lookup
+      migration: events_nodes
+      source: id
+    -
+      plugin: array_shift
+  langcode: constants/langcode
+  uid:
+    plugin: default_value
+    default_value: '1'
+  title:
+    -
+      plugin: extract_or_shift
+      source: title
+      index:
+        - en
+    -
+      plugin: skip_on_empty
+      method: row
+  field_media/target_id:
+    plugin: migration_lookup
+    migration: events_medias
+    source: id
+  sticky: featured
+  field_weight: _index
+  field_introduction/value:
+    - plugin: extract_or_shift
+      source: html
+      index:
+        - en
+    - plugin: trim_and_skip_on_empty
+      method: process
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_introduction/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_texte/value:
+    - plugin: extract_or_shift
+      source: description
+      index:
+        - en
+    - plugin: trim_and_skip_on_empty
+      method: process
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_texte/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_conditions/value:
+    - plugin: extract_or_shift
+      source: conditions
+      index:
+        - en
+    - plugin: trim_and_skip_on_empty
+      method: process
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_conditions/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_end_date: lastDate
+  field_end_time_start: lastTimeStart
+  field_end_time_end: lastTimeEnd
+  field_start_date: firstDate
+  field_start_time_start: firstTimeStart
+  field_start_time_end: firstTimeEnd
+  field_link:
+    plugin: checkurl
+    source: registrationUrl
+  field_detail:
+    - plugin: extract_or_shift
+      source: range
+      index:
+        - en
+  field_map/lng: longitude
+  field_map/lat: latitude
+  field_adress :
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: address
+  field_zipcode: postalCode
+  field_city: city
+  field_region: region
+  field_departement: department
+  field_tag:
+    plugin: iterator
+    source: tags
+    process:
+      target_id:
+        source: label
+        plugin: entity_generate
+        value_key: name
+        bundle_key: vid
+        bundle: tags
+        entity_type: taxonomy_term
+        ignore_case: true
+  field_public:
+    plugin: iterator
+    source: publics
+    process:
+      target_id:
+        source: label
+        plugin: entity_generate
+        value_key: name
+        bundle_key: vid
+        bundle: public
+        entity_type: taxonomy_term
+        ignore_case: true
+  field_thematique:
+    plugin: iterator
+    source: thematics
+    process:
+      target_id:
+        source: label
+        plugin: entity_generate
+        value_key: name
+        bundle_key: vid
+        bundle: event_taxonomy
+        entity_type: taxonomy_term
+        ignore_case: true
+  field_type_events:
+    plugin: iterator
+    source: events
+    process:
+      target_id:
+        source: label
+        plugin: entity_generate
+        value_key: name
+        bundle_key: vid
+        bundle: events
+        entity_type: taxonomy_term
+        ignore_case: true
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+destination:
+  plugin: 'entity:node'
+  default_bundle: event
+  translations: true
+migration_dependencies:
+  require:
+    - events_medias

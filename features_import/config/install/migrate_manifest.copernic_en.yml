@@ -1,0 +1,17 @@
+#####################################################################
+# COPERNIC
+#####################################################################
+# lpg nodes fr              (COPERNIC)         (TC : vouchers) ok
+- master_lpj_nodes_en
+
+# nodes                     (COPERNIC)         (TC : parcour) ok
+- master_nodes_en
+
+# mention                   (COPERNIC)         (TC : training) ok
+- mentions_nodes_en
+
+# MRS
+# bin/drush mrs master_lpj_nodes_en;bin/drush mrs master_nodes_en;bin/drush mrs mentions_nodes_en;
+
+# MIM
+# bin/drush mm modules/features/features_import/config/install/migrate_manifest.copernic_en.yml --update

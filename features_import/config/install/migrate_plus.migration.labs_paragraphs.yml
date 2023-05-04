@@ -1,0 +1,57 @@
+langcode: fr
+id: labs_paragraphs
+migration_tags: null
+migration_group: null
+label: 'Import paragraphs labs'
+source:
+  plugin: custom_url
+  urls:
+    - https://bibliolabs.xxx.com
+  labcount: 10
+  lablength: 300
+  labStart: 1
+  data_fetcher_plugin: http_plus
+  no_exception: true
+  curl:
+    verify: FALSE
+  request_options:
+    timeout: 180
+  data_parser_plugin: jsonpath_custom
+  item_selector: '$[*].docs[*]'
+  labcount: 10
+  lablength: 300
+  labStart: 1
+  fields:
+    - name: doi
+      label: 'doi'
+      selector: '$.doi'
+    - name: title
+      label: 'title'
+      selector: '$.title'
+    - name: date
+      label: 'date'
+      selector: '$.date'
+    - name: publicationSource
+      label: 'publicationSource'
+      selector: '$.publicationSource'
+    - name: authors
+      label: 'authors'
+      selector: '$.authors'
+  ids:
+    doi:
+      type: string
+
+process:
+  field_title_docs: title
+  field_doi: doi
+  field_publication_source: publicationSource
+  field_author: authors
+  field_date/value:
+    plugin: format_date
+    source: date
+    from_format: 'd/m/Y'
+    to_format: 'Y-m-d'
+
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: documents

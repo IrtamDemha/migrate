@@ -1,0 +1,46 @@
+langcode: fr
+id: mentions_nodes_update_graduate
+migration_tags: null
+migration_group: null
+label: 'Import Entreprise  d liste'
+source:
+  plugin: customspreadSheet
+  directory: private://graduate_school
+  worksheet: Masters
+  origin: A2
+  header_row: 1
+  columns:
+    - codes_mention
+    - mentions_de_master
+    - graduate_schools
+
+  keys:
+    codes_mention:
+      type: string
+process:
+  nid:
+    - plugin: skip_on_empty
+      method: row
+      source: codes_mention
+    - plugin: migration_lookup
+      migration: mentions_nodes
+      source: codes_mention
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+  field_graduate_school_node/target_id:
+    plugin: entity_generate
+    source: graduate_schools
+    value_key: title
+    bundle_key: type
+    bundle: graduate_school
+    entity_type: node
+    ignore_case: true
+destination:
+  plugin: 'entity:node'
+  bundle: training
+  overwrite_properties:
+migration_dependencies:
+  require:
+    - master_nodes
+

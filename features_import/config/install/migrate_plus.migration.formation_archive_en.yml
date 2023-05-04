@@ -1,0 +1,36 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: formation_archive_en
+migration_tags: null
+migration_group: null
+label: 'Archive shphinx_fr files'
+source:
+  plugin: directory_files
+  path: 'private://sphinx_en/input'
+  constants:
+    dest_prefix: 'private://sphinx_en/archive/'
+    dest_pattern: 'Y-m-d'
+    file_separator: '/'
+process:
+  _source_file_path: path
+  _dest_directory_path:
+    plugin: callback
+    callable: date
+    source: constants/dest_pattern
+  _dest_file_path:
+    -
+      plugin: concat
+      source:
+        - constants/dest_prefix
+        - '@_dest_directory_path'
+        - constants/file_separator
+        - basename
+  _move:
+    plugin: file_copy
+    move: true
+    source:
+      - '@_source_file_path'
+      - '@_dest_file_path'
+destination:
+  plugin: 'nowhere'

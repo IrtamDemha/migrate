@@ -1,0 +1,46 @@
+#####################################################################
+# SPHINX
+#####################################################################
+# cours                     (SPHINX/programme) (TC : course)
+- courses_master_nodes:
+    source:
+      rollback: TRUE
+
+# modules                   (SPHINX/programme) (TC : program)
+- module_master
+
+# semestre                  (SPHINX/programme) (TC : program)
+- program_master
+
+# link cours to module      (SPHINX/programme) (TC : program)
+- module_master_update
+
+# link module to semestre    (SPHINX/programme) (TC : program)
+- program_master_update
+
+#  link semestre to node    (SPHINX/programme) (TC : parcour)
+- master_nodes_update
+
+# Archive files
+- formation_archive
+
+
+
+# MRS (Status)
+# bin/drush mrs courses_master_nodes;bin/drush mrs module_master;bin/drush mrs program_master;bin/drush mrs module_master_update;bin/drush mrs program_master_update;bin/drush mrs master_nodes_update;bin/drush mrs formation_archive;
+# docker-compose exec www bin/drush mrs courses_master_nodes;docker-compose exec www bin/drush mrs module_master;docker-compose exec www bin/drush mrs program_master;docker-compose exec www bin/drush mrs module_master_update;docker-compose exec www bin/drush mrs program_master_update;docker-compose exec www bin/drush mrs master_nodes_update;docker-compose exec www bin/drush mrs formation_archive;
+
+# MR (Rollback)
+# bin/drush mr module_master;bin/drush mr program_master;
+# bin/drush sqlq "truncate migrate_map_module_master_update;truncate migrate_map_program_master_update;truncate migrate_map_master_nodes_update;";
+# docker-compose exec www bin/drush mr module_master;docker-compose exec www bin/drush mr program_master;
+# docker-compose exec www bin/drush sqlq "truncate migrate_map_module_master_update;truncate migrate_map_program_master_update;truncate migrate_map_master_nodes_update;";
+
+# MIM (Import)
+# bin/drush mm modules/features/features_import/config/install/migrate_manifest.sphinx_programme.yml --update
+# docker-compose exec www bin/drush mm modules/features/features_import/config/install/migrate_manifest.sphinx_programme.yml --update
+# OR
+# bin/drush mim courses_master_nodes --update;bin/drush mim module_master --update;bin/drush mim program_master --update;bin/drush mim module_master_update --update;bin/drush mim program_master_update --update;bin/drush mim master_nodes_update --update;
+
+# Execute this :
+# date;bin/drush mm modules/features/features_import/config/install/migrate_manifest.sphinx_programme.yml --update;date;bin/drush sapi-i;date;

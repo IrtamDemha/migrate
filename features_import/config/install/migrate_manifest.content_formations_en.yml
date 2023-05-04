@@ -1,0 +1,34 @@
+#####################################################################
+# COPERNIC
+#####################################################################
+# lpg nodes fr              (COPERNIC)         (TC : vouchers) ok
+- master_lpj_nodes_en
+
+# nodes                     (COPERNIC)         (TC : parcour) ok
+- master_nodes_en
+
+# mention                   (COPERNIC)         (TC : training) ok
+- mentions_nodes_en
+
+#####################################################################
+# SPHINX
+#####################################################################
+# cours                     (SPHINX/programme) (TC : course)
+- courses_master_nodes_en
+
+# modules                   (SPHINX/programme) (TC : program) 
+# ATTENTION les identifiants peuvent glisser
+#- module_master_en
+
+# semestre                  (SPHINX/programme) (TC : program)
+# ATTENTION les identifiants peuvent glisser
+#- program_master_en
+
+# Archive files
+- formation_archive_en
+
+# MRS
+# bin/drush mrs master_lpj_nodes_en;bin/drush mrs master_nodes_en;bin/drush mrs mentions_nodes_en;bin/drush mrs courses_master_nodes_en;bin/drush mrs module_master_en;bin/drush mrs program_master_en;bin/drush mrs formation_archive_en;
+
+# MIM
+# bin/drush mm modules/features/features_import/config/install/migrate_manifest.content_formations_en.yml --update

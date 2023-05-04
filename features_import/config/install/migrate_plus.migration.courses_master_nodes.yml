@@ -1,0 +1,223 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: courses_master_nodes
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_fr/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - code rof
+    - niveau
+    - code_EN
+    - intitule_ue
+    - semestre_ue
+    - nb_ects_semestre
+    - bloc_UE
+    - nbr_ects_ue
+    - detail_semestre
+    - Langue_UE
+    - intitule_UE_AN
+    - contenu_ue
+    - heures_cours
+    - heures_travaux_diriges
+    - heures_travaux_pratiques
+    - heures_cours_TD
+    - heures_cours_TP
+    - heures_TD_TP
+    - heures_A_distance
+    - heures_Projet
+    - heures_tutorat
+    - nom_coordinateur
+    - prenom_coordinateur
+    - equipe_peda
+    - deroulement_orga_pratique
+    - pre_requis
+    - bibiographie
+    - temporalite
+    - lieux_ens
+    - lieux_ens_autre
+  keys:
+    code_EN:
+      type: string
+  constants:
+    related_cycle: 'training'
+process:
+  field_external_id: code_EN
+  title: intitule_ue
+  field_title_en:
+    plugin: conditional_field
+    condition: 'FR/AN'
+    source:
+      - Langue_UE
+      - intitule_UE_AN
+
+  field_volume_cm: heures_cours
+  field_volume_c_td : heures_cours_TD
+  field_volume_c_tp : heures_cours_TP
+  field_volume_c_online : heures_A_distance
+  field_description/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: contenu_ue
+    - plugin: upper_point
+    - plugin: callback
+      callable: _filter_autop
+
+    - plugin: filter_url
+
+  field_description/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_requirement/value:
+    -
+      plugin: trim_and_skip_on_empty
+      method: process
+      source: pre_requis
+    - plugin: upper_point
+    -
+      plugin: callback
+      callable: _custom_filter_autop
+    - plugin: filter_url
+
+  field_requirement/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_orga_pratique/value:
+    -
+      plugin: trim_and_skip_on_empty
+      method: process
+      source: deroulement_orga_pratique
+    - plugin: upper_point
+    -
+      plugin: callback
+      callable: _custom_filter_autop
+    - plugin: filter_url
+
+  field_orga_pratique/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_bibliography/value:
+    -
+      plugin: trim_and_skip_on_empty
+      method: process
+      source: bibiographie
+    - plugin: upper_point
+    -
+      plugin: callback
+      callable: _custom_filter_autop
+    -
+      plugin: filter_url
+
+  field_bibliography/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_temporalite/value:
+  -
+    plugin: trim_and_skip_on_empty
+    method: process
+    source: temporalite
+
+  - plugin: upper_point
+  -
+    plugin: callback
+    callable: _custom_filter_autop
+
+  field_temporalite/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+
+  places:
+    plugin: toArray
+    source:
+      - lieux_ens
+      - lieux_ens_autre
+
+  field_places:
+    plugin: iterator
+    source: '@places'
+    process:
+      value:
+        - plugin: trim_and_skip_on_empty
+          method: process
+          source: texte
+        - plugin: callback
+          callable: _custom_filter_autop
+        - plugin: filter_url
+
+      format:
+        plugin: default_value
+        default_value: 'basic_html'
+
+  field_volume_project : heures_Projet
+  field_volume_td : heures_travaux_diriges
+  field_volume_tp : heures_travaux_pratiques
+  field_volume_tutorat : heures_tutorat
+  field_volume_c_tp_td : heures_TD_TP
+  field_volume_ects : nbr_ects_ue
+  field_educational_team/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: equipe_peda
+
+    - plugin: upper_point
+
+    - plugin: callback
+      callable: _custom_filter_autop
+
+  field_educational_team/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  field_teaching_languages/target_id:
+    plugin: entity_generate
+    source: Langue_UE
+    value_key: name
+    bundle_key: vid
+    bundle: teaching_languages
+    entity_type: taxonomy_term
+    ignore_case: true
+
+  contributor:
+    plugin: concat
+    source:
+      - nom_coordinateur
+      - prenom_coordinateur
+    delimiter: ' '
+
+
+  field_person/target_id:
+    plugin: entity_generate
+    source: '@contributor'
+    value_key: title
+    bundle_key: type
+    bundle: person
+    entity_type: node
+    ignore_case: true
+
+  status:
+    plugin: default_value
+    default_value: '1'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+  field_content_type_source: constants/related_cycle
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: course
+
+
+
+

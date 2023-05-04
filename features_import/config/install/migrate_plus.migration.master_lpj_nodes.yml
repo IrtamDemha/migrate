@@ -1,0 +1,89 @@
+langcode: fr
+id: master_lpj_nodes
+migration_tags: null
+migration_group: null
+label: 'Import master_lpj_nodes '
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: jsonlpj
+  urls:
+    - https://api.copernic.xxx.xxx
+
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+
+    - name: temObligatoire
+      label: 'lib temObligatoire'
+      selector: temObligatoire
+
+    - name: libelle_id
+      label: ' libelle_id'
+      selector: libelle_id
+    - name: libelle_fr
+      label: 'lib libelle'
+      selector: libelle_fr
+    - name: libelle_en
+      label: 'lib libelle'
+      selector: libelle_en
+    - name: id_elfPj
+      label: 'Unique id'
+      selector: id_elfPj
+
+    - name: comment_fr
+      label: 'Unique id'
+      selector: comment_fr
+  ids:
+    id_elfPj:
+      type: string
+
+
+process:
+
+  title: id_elfPj
+  field_description/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: libelle_fr
+    - plugin: upper_point
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_description/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_mandatory: temObligatoire
+  field_external_id: id_elfPj
+  field_texte/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: comment_fr
+  field_texte/format:
+    plugin: default_value
+    default_value: "basic_html"
+
+  status:
+    plugin: default_value
+    default_value: '1'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: vouchers

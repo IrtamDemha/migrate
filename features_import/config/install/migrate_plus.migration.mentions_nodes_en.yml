@@ -1,0 +1,73 @@
+langcode: fr
+id: mentions_nodes_en
+migration_tags: null
+migration_group: null
+label: 'Import Entreprise  d liste'
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: formation
+  language: English
+  constants:
+    diplome: 'Master'
+    langcode: en
+  urls:
+    - https://api.copernic.xxx.xxx
+
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+    -
+      name: title
+      selector: libelle_en
+    -
+      name: lang
+      selector: lang
+
+    - name: id
+      selector: id
+
+  ids:
+    id:
+      type: string
+
+process:
+
+  nid:
+    - plugin: skip_on_empty
+      method: row
+      source: id
+    - plugin: migration_lookup
+      migration: mentions_nodes
+      source: id
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+
+  title: title
+  langcode:
+    plugin: default_value
+    default_value: "en"
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: training
+  translations: true
+migration_dependencies:
+  require:
+    - mentions_nodes
+

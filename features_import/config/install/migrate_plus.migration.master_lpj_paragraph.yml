@@ -1,0 +1,88 @@
+langcode: fr
+id: master_lpj_paragraph
+migration_tags: null
+migration_group: null
+label: 'Import Entreprise  d liste'
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: jsoncustom
+  urls:
+    - https://api.copernic.xxx.xxx
+
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+
+    - name: temObligatoire
+      label: 'lib temObligatoire'
+      selector: temObligatoire
+
+    - name: libelle_id
+      label: ' libelle_id'
+      selector: libelle_id
+    - name: libelle
+      label: 'lib libelle'
+      selector: libelle
+    - name: id_elfPj
+      label: 'Unique id'
+      selector: id_elfPj
+
+    - name: comment
+      label: 'Unique id'
+      selector: comment
+  ids:
+    id_elfPj:
+      type: string
+
+
+process:
+
+
+  texte:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: libelle
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+
+
+
+  array:
+    plugin: texte_format
+    source:
+      - '@texte'
+
+  field_voucher/target_id:
+    plugin: entity_generate
+    entity_type: node
+    source: libelle
+    bundle_key: type
+    bundle: vouchers
+    value_key: title
+    ignore_case: true
+    values:
+      field_description: '@array'
+
+  field_mandatory: temObligatoire
+  field_text: comment
+
+
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: vouchers

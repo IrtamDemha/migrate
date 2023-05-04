@@ -1,0 +1,11 @@
+#[Import] Formations 1er cycle : 02h:05
+5 2 * * *  /var/www/html/vendor/drush/drush/drush --root=/var/www/html/bin/web mm modules/features/features_formations/config/install/migrate_manifest.rof.yml --update
+
+#[Import] Formations 2eme cycle : 02h:35
+35 2 * * *  /var/www/html/vendor/drush/drush/drush --root=/var/www/html/bin/web mm modules/features/features_import/config/install/migrate_manifest.copernic.yml --update
+
+#[Import] Formations 2eme cycle : 03h:35
+35 3 * * *  /var/www/html/vendor/drush/drush/drush --root=/var/www/html/bin/web mm modules/features/features_import/config/install/migrate_manifest.copernic_en.yml --update
+
+#[Import] Programmes 2eme cycle (SPHINX) : 04h:35
+35 4 * * *  /var/www/html/vendor/drush/drush/drush --root=/var/www/html/bin/web mm modules/features/features_import/config/install/migrate_manifest.sphinx_programme.yml --update >> ~/log/migrate.sphinx.log 2>&1

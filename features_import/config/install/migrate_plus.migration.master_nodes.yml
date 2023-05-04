@@ -1,0 +1,379 @@
+langcode: fr
+id: master_nodes
+migration_tags: null
+migration_group: null
+label: 'Import master  liste'
+source:
+  plugin: url
+
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: json
+  constants:
+    diplome: 'Master'
+    related_cycle: 'training'
+
+  urls:
+    - https://api.copernic.xxx.xxx
+
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+
+    - name: parent_id
+      label: 'libRof'
+      selector: /elemFormJson/id
+    -
+      name: libRof
+      label: 'libRof'
+      selector: /elemFormJson/libelle/libelleParLangue/1/libelle
+    -
+      name: capaciteAccueil
+      label: 'capaciteAccueil'
+      selector: /elemFormJson/capaciteAccueil
+
+    - name: lieu
+      label: 'lieu'
+      selector: /elemFormJson/etablissementSaclay
+
+
+    - name: communes
+      label: 'communes'
+      selector: /elemFormJson/communes
+
+    - name: typesFormation
+      label: 'communes'
+      selector: /elemFormJson/typesFormation
+
+    - name: anne
+      label: 'anne'
+      selector: /elemFormJson/niveauDiplome/codNivDip
+
+    - name: anne_lib
+      label: 'anne_lib'
+      selector: /elemFormJson/niveauDiplome/libNiveauDiplome
+
+    -
+      name: elfPj
+      label: 'elfPj'
+      selector: /elemFormJson/elfPj
+    -
+      name: codRof
+      label: 'codRof'
+      selector: /elemFormJson/codRof
+    -
+      name: rsvp
+      label: 'rsvp'
+      selector: /elemFormJson/periodesCandidature
+    -
+      name: periodesCandidatureFin
+      label: 'periodesCandidatureFin'
+      selector: /elemFormJson/periodesCandidature/0/dateFin
+    -
+      name: periodesCandidatureStart
+      label: 'periodesCandidatureStart'
+      selector: /elemFormJson/periodesCandidature/0/dateDebut
+
+
+    - name: periodesCandidatureFin1
+      label: 'periodesCandidatureFin1'
+      selector: /elemFormJson/periodesCandidature/1/dateFin
+
+    - name: periodesCandidatureStart1
+      label: 'periodesCandidatureStart1'
+      selector: /elemFormJson/periodesCandidature/1/dateDebut
+    -
+      name: responsables
+      label: 'responsables'
+      selector: /elemFormJson/responsables
+
+
+
+    - name: sub_responsables
+      label: 'responsables'
+      selector: /elemFormJson/personneRoleElf
+
+
+    -
+      name: id
+      label: 'Unique id'
+      selector: id
+
+    - name: langues
+      label: 'langues'
+      selector: /elemFormJson/langues
+
+    - name: publish
+      label: 'publish'
+      selector: /elemFormJson/publieWeb/libTech
+
+
+    - name: statutElf
+      label: 'publish'
+      selector: /elemFormJson/statutElf/libTechnique
+  ids:
+    codRof:
+      type: string
+process:
+
+  field_status:
+    plugin: static_map
+    source: statutElf
+    map:
+      OUV_NORM: 1
+      OUV_PAS_AN: 0
+
+
+  field_content_type_source: constants/related_cycle
+  title:
+   plugin: title_prefix
+   source:
+    - libRof
+    - anne
+
+  field_external_id: codRof
+  field_capacity: capaciteAccueil
+  field_establishment/target_id:
+    plugin: entity_generate
+    source: lieu/codNatUai
+    value_key: field_external_id
+    bundle_key: vid
+    bundle: establishment
+    entity_type: taxonomy_term
+    ignore_case: true
+    values:
+      name: lieu/libLongEtab
+
+  field_communes:
+    plugin: iterator
+    source: communes
+    process:
+      target_id:
+        plugin: entity_generate
+        source: id
+        value_key: field_external_id
+        bundle_key: vid
+        bundle: communes
+        entity_type: taxonomy_term
+        ignore_case: true
+        values:
+          name: libelleCommune
+          field_zipcode: codePostal
+          field_status: actif
+
+  field_regime_inscription:
+    plugin: iterator
+    source: typesFormation
+    process:
+      target_id:
+        plugin: entity_generate
+        source: id
+        value_key: field_external_id
+        bundle_key: vid
+        bundle: regime_inscription
+        entity_type: taxonomy_term
+        ignore_case: true
+        values:
+          name: libTypFormation
+
+
+
+  field_teaching_languages:
+    plugin: sub_process
+    source: langues
+    process:
+      target_id:
+        plugin: entity_generate
+        source: codLangue
+        entity_type: taxonomy_term
+        bundle_key: vid
+        bundle: teaching_languages
+        value_key: field_external_id
+        ignore_case: true
+        values:
+          name: 'libLangue'
+
+  field_teaching_languages/target_id:
+    -
+      plugin: get_language
+      source: langue
+    -
+      plugin: entity_generate
+      value_key: name
+      bundle_key: vid
+      bundle: teaching_languages
+      entity_type: taxonomy_term
+      ignore_case: true
+
+  field_start_date:
+    -
+      plugin: explode
+      source: periodesCandidatureStart
+      delimiter: T
+    -
+      plugin: extract
+      index:
+        - 0
+  field_end_date:
+    -
+      plugin: explode
+      source: periodesCandidatureFin
+      delimiter: T
+    -
+      plugin: extract
+      index:
+        - 0
+
+
+  field_start_date_1:
+    -
+      plugin: explode
+      source: periodesCandidatureStart1
+      delimiter: T
+    -
+      plugin: extract
+      index:
+        - 0
+
+
+  field_end_date_1:
+    -
+      plugin: explode
+      source: periodesCandidatureFin1
+      delimiter: T
+    -
+      plugin: extract
+      index:
+        - 0
+
+  field_responsible:
+    -
+      plugin: person
+      source: responsables
+    -
+      plugin: iterator
+      process:
+        target_id:
+          plugin: entity_generate_custom
+          value_key: field_external_id
+          bundle_key: type
+          bundle: person
+          entity_type: node
+          source: id
+          ignore_case: true
+          values:
+            title: name
+            field_email: email
+            field_external_id: id
+
+
+
+  field_sub_responsible:
+    - plugin: sub_person
+      source: sub_responsables
+    - plugin: iterator
+      process:
+        target_id:
+          plugin: entity_generate_custom
+          value_key: field_external_id
+          bundle_key: type
+          bundle: person
+          entity_type: node
+          source: id
+          ignore_case: true
+          values:
+            title: name
+            field_email: email
+            field_external_id: id
+
+  field_voucher:
+   -
+      plugin: vouchers
+      source:
+        -  parent_id
+        -  elfPj
+   -
+     plugin: iterator
+     process:
+       target_id:
+        plugin: migration_lookup
+        migration: master_lpj_nodes
+        source: pieceJustificative/id
+
+
+  field_type: constants/diplome
+  field_annee_dans_diplome/target_id:
+    plugin: entity_generate
+    source: anne
+    value_key: field_external_id
+    bundle_key: vid
+    bundle: annee_dans_diplome
+    entity_type: taxonomy_term
+    ignore_case: true
+    values:
+      name: anne_lib
+
+  status:
+    plugin: static_map
+    source: publish
+    map:
+      OUI: 1
+      NON: 0
+  moderation_state:
+    plugin: static_map
+    source: publish
+    map:
+      OUI: 'published'
+      NON: 'draft'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+  field_date_rsvp_start:
+    plugin: custom_periode_candidature
+    source: rsvp
+    index:
+      - dateDebut
+  field_date_rsvp_end:
+    plugin: custom_periode_candidature
+    source: rsvp
+    index:
+      - dateFin
+  
+destination:
+  plugin: 'entity:node'
+  default_bundle: parcour
+  overwrite_properties:
+    - field_content_type_source
+    - title
+    - status
+    - field_voucher
+    - field_responsible
+    - field_capacity
+    - field_type
+    - field_annee_dans_diplome
+    - field_sub_responsible
+    - field_start_date
+    - field_start_date_1
+    - field_end_date
+    - field_end_date_1
+    - field_establishment
+    - field_teaching_languages
+    - field_communes
+    - field_regime_inscription
+    - field_date_rsvp_start
+    - field_date_rsvp_end
+    - field_status

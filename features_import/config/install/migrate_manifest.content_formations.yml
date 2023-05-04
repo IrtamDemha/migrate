@@ -1,0 +1,44 @@
+#####################################################################
+# COPERNIC
+#####################################################################
+# lpg nodes fr              (COPERNIC)         (TC : vouchers)
+- master_lpj_nodes
+
+# nodes                     (COPERNIC)         (TC : parcour)
+- master_nodes
+
+# mention                   (COPERNIC)         (TC : training)
+- mentions_nodes
+
+#####################################################################
+# SPHINX
+#####################################################################
+# cours                     (SPHINX/programme) (TC : course)
+- courses_master_nodes
+
+# modules                   (SPHINX/programme) (TC : program)
+- module_master
+
+# semestre                  (SPHINX/programme) (TC : program)
+- program_master
+
+# link cours to module      (SPHINX/programme) (TC : program)
+- module_master_update
+
+# link cours to semestre    (SPHINX/programme) (TC : program)
+- program_master_update
+
+#  link semestre to node    (SPHINX/programme) (TC : parcour)
+- master_nodes_update
+
+# Archive files
+- formation_archive
+
+# MRS
+# bin/drush mrs master_lpj_nodes;bin/drush mrs master_nodes;bin/drush mrs mentions_nodes;bin/drush mrs courses_master_nodes;bin/drush mrs module_master;bin/drush mrs program_master;bin/drush mrs module_master_update;bin/drush mrs program_master_update;bin/drush mrs master_nodes_update;bin/drush mrs formation_archive;
+
+# MR
+# bin/drush mr module_master;bin/drush mr program_master;
+
+# MIM
+# bin/drush mm modules/features/features_import/config/install/migrate_manifest.content_formations.yml --update

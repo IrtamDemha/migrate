@@ -1,0 +1,79 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: program_master_en
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_en/input/
+  constants:
+    lang: English
+    langcode: en
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - semestre_ue
+    - code_semestre
+    - detail_semestre
+    - nb_ects_semestre
+  keys:
+    code_semestre:
+      type: string
+
+process:
+
+  nid:
+    - plugin: skip_on_empty
+      method: row
+      source: code_semestre
+    - plugin: migration_lookup
+      migration: program_master
+      source: code_semestre
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+
+  langcode: constants/langcode
+  title: semestre_ue
+  field_external_id: code_semestre
+  field_description/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: detail_semestre
+    - plugin: upper_point
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+
+  field_description/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_volume_ects: nb_ects_semestre
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+  uid:
+    plugin: default_value
+    default_value: '1'
+destination:
+  plugin: 'entity:node'
+  default_bundle: program
+  translations: true
+  overwrite_properties:
+    - title
+    - field_description
+    - field_volume_ects
+migration_dependencies:
+  require:
+    - module_master
+
+
+
+
+

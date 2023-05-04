@@ -1,0 +1,152 @@
+langcode: fr
+id: labs_nodes
+migration_tags: null
+migration_group: null
+label: 'Import labs'
+source:
+  plugin: custom_url
+  data_fetcher_plugin: http_plus
+  no_exception: true
+  curl:
+    verify: FALSE
+  request_options:
+    timeout: 180
+  data_parser_plugin: jsonpath_custom
+  item_selector: '$[*]'
+  urls:
+    - https://bibliolabs.xxxx.xxx
+  labcount: 10
+  lablength: 300
+  labStart: 1
+
+  fields:
+    - name: officialName
+      label: 'officialName'
+      selector: $.officialName
+    - name: acronym
+      label: 'acronym'
+      selector: $.acronym
+    - name: scanRURL
+      label: 'scanRURL'
+      selector: $.scanRURL
+    - name: description
+      label: 'description'
+      selector: $.description
+    - name: websiteURL
+      label: 'websiteURL'
+      selector: $.websiteURL
+    - name: graduateSchools
+      label: 'graduateSchools'
+      selector: $.graduateSchools
+    - name: classificationData
+      label: 'classificationData'
+      selector: $.classificationData.data
+    - name: docsCount
+      label: 'docsCount'
+      selector: $.classificationData.docsCount
+    - name: supervisions
+      label: 'supervisions'
+      selector: '$.supervisions[*]'
+    - name: docs
+      label: 'docs'
+      selector: $.docs[*].doi
+    - name: pertinentKeywords
+      label: 'pertinentKeywords'
+      selector: $.pertinentKeywords
+    - name: isActive
+      label: 'isActive'
+      selector: $.isActive
+    - name: labId
+      label: 'labId'
+      selector: $.labId
+  ids:
+    labId:
+      type: integer
+
+process:
+  uid:
+    plugin: default_value
+    default_value: '1'
+  title: officialName
+  field_texte: acronym
+  field_link:
+    plugin: checkurl
+    source: scanRURL
+  field_classifications:
+    plugin: iterator
+    source: classificationData
+    process:
+      value: classification
+      key: docsCount
+  field_description/value:
+    - plugin: trim_and_skip_on_empty
+      method: process
+      source: description
+    - plugin: callback
+      callable: _filter_autop
+    - plugin: filter_url
+  field_description/format:
+    plugin: default_value
+    default_value: "basic_html"
+  field_docs_count: docsCount
+  field_link_1:
+    plugin: checkurl
+    source: websiteURL
+  field_guardianship:
+    source: supervisions
+    plugin: entity_generate
+    value_key: name
+    bundle_key: vid
+    bundle: laboratory_guardianship
+    entity_type: taxonomy_term
+    ignore_case: true
+  field_graduate_school:
+    source: graduateSchools
+    plugin: entity_generate
+    value_key: name
+    bundle_key: vid
+    bundle: graduate_school
+    entity_type: taxonomy_term
+    ignore_case: true
+  temporary_ids:
+    plugin: migration_lookup
+    migration: labs_paragraphs
+    source: docs
+  field_documents:
+    plugin: sub_process
+    source: '@temporary_ids'
+    process:
+      target_id: '0'
+      target_revision_id: '1'
+  field_tag:
+    -
+      plugin: explode
+      source: pertinentKeywords
+      delimiter: ','
+    -
+      plugin: callback
+      callable: trim
+    -
+      plugin: entity_generate
+      value_key: name
+      bundle_key: vid
+      bundle: tags
+      entity_type: taxonomy_term
+      ignore_case: true
+  status:
+    plugin: static_map
+    source: isActive
+    map:
+      true: 1
+      false: 0
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: laboratory
+
+migration_dependencies:
+  require:
+    - labs_paragraphs

@@ -1,0 +1,10 @@
+services:
+  custom_migrate.migrate_subscriber:
+    class: Drupal\custom_migrate\EventSubscriber\GroupEventSubScriber
+    tags:
+      - {name: event_subscriber}
+  events_groups_migrate.commands:
+    class: \Drupal\custom_migrate\Commands\EventsGroupsCommands
+    arguments: ['@gdomain.helper', '@plugin.manager.migration']
+    tags:
+      - { name: drush.command }

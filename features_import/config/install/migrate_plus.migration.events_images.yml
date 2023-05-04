@@ -1,0 +1,55 @@
+langcode: fr
+id: events_images
+migration_tags: null
+migration_group: null
+label: 'Import events images'
+source:
+  plugin: url
+  data_fetcher_plugin: file
+  # Choose one data parser.
+  data_parser_plugin: json
+
+  constants:
+    file_destination: 'public://media/agenda/'
+  urls:
+    - https://xxx.xxxx.xxx
+
+  item_selector: events
+  fields:
+
+    - name: originalImage
+      label: 'Image original'
+      selector: originalImage
+    - name: title
+      label: 'Alt'
+      selector: title\fr
+    - name: id
+      label: 'id'
+      selector: uid
+
+  ids:
+    id:
+      type: string
+
+
+process:
+
+  public_path:
+    -
+      plugin: concat
+      delimiter: ''
+      source:
+        - constants/file_destination
+        - file_name
+    -
+      plugin: urlencode
+  uri:
+    plugin: file_copy
+    source:
+      - originalImage
+      - '@public_path'
+  uid:
+    plugin: default_value
+    default_value: '1'
+destination:
+  plugin: entity:file

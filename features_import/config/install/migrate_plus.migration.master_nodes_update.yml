@@ -1,0 +1,46 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: master_nodes_update
+migration_tags: null
+migration_group: null
+label: 'Import programs 2'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_fr/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - 'code rof'
+    - niveau
+    - code_semestre
+    - semestre_ue
+  keys:
+    code_semestre:
+      type: string
+process:
+  nid:
+    - plugin: migration_lookup
+      migration: master_nodes
+      source: 'code rof'
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+  sid:
+    plugin: migration_lookup
+    migration: program_master
+    source: code_semestre
+  field_programs:
+    plugin: fieldlookupsort
+    type: node
+    field: field_programs
+    source:
+      - '@nid'
+      - '@sid'
+      - semestre_ue
+destination:
+  plugin: 'entity:node'
+  bundle: parcour
+  overwrite_properties:
+    - field_programs

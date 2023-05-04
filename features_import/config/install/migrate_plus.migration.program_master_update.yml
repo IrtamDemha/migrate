@@ -1,0 +1,50 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: program_master_update
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_fr/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - semestre_ue
+    - code_semestre
+    - bloc_UE
+    - code_bloc
+  keys:
+    code_bloc:
+      type: string
+    code_semestre:
+      type: string
+process:
+  nid:
+    - plugin: migration_lookup
+      migration: program_master
+      source: code_semestre
+      no_stub: true
+    - plugin: skip_on_empty
+      method: row
+
+  bid:
+    plugin: migration_lookup
+    migration: module_master
+    source: code_bloc
+
+  field_programs:
+    plugin: fieldlookup
+    field: field_programs
+    type: node
+    source:
+      - '@nid'
+      - '@bid'
+
+destination:
+  plugin: 'entity:node'
+  bundle: program
+  overwrite_properties:
+    - field_programs

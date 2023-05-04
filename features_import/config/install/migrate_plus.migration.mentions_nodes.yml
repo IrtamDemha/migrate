@@ -1,0 +1,136 @@
+langcode: fr
+id: mentions_nodes
+migration_tags: null
+migration_group: null
+label: 'Import Entreprise  d liste'
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  # Choose one data parser.
+  data_parser_plugin: formation
+  language: Frensh
+  constants:
+    diplome: 'Master'
+    related_cycle: 'training'
+
+  urls:
+    - https://api.xxxxx.com
+
+
+  # This configuration is provided by the http data fetcher plugin.
+  # Do not disclose any sensitive information in the headers.
+  headers:
+    Accept: 'application/json; charset=utf-8'
+    X-COPERNIC-API-ID: 'SiteWebUPSaclayV2'
+    X-COPERNIC-API-KEY: '8033d10d1070a2c181d5b5a5694b8dd0dbc6fb5d463adeaac1fd1e7735f3f993'
+
+  # This configuration is provided by the basic authentication plugin.
+  # Credentials should never be saved in plain text nor committed to the repo.
+  authentication:
+    plugin: basic
+    username: totally
+    password: insecure
+
+  fields:
+    -
+      name: title
+      selector: libelle
+    -
+      name: master
+      selector: master
+
+    - name: id
+      selector: id
+
+    - name: school
+      selector: school
+
+    - name: responsables
+      selector: responsables
+  ids:
+    id:
+      type: string
+process:
+  title: title
+  field_external_id: id
+  field_parcour:
+    plugin: iterator
+    source: master
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: master_nodes
+        source: id
+
+
+  field_responsible:
+    -
+      plugin: person
+      source: responsables
+    -
+      plugin: iterator
+      process:
+        target_id:
+          plugin: entity_generate_custom
+          value_key: field_external_id
+          bundle_key: type
+          bundle: person
+          entity_type: node
+          source: id
+          ignore_case: true
+          values:
+            title: name
+            field_email: email
+            field_external_id: id
+
+
+
+
+  field_type_diplome/target_id:
+    plugin: entity_generate
+    source: constants/diplome
+    entity_type: taxonomy_term
+    bundle_key: vid
+    bundle: type_diplome
+    value_key: field_external_id
+    ignore_case: true
+    values:
+      name: constants/diplome
+#
+  field_diplome:
+    plugin: entity_generate
+    entity_type: node
+    source: constants/diplome
+    bundle_key: type
+    bundle: diplome
+    value_key: field_external_id
+    ignore_case: true
+    values:
+      title: constants/diplome
+
+  field_content_type_source: constants/related_cycle
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+  uid:
+    plugin: default_value
+    default_value: '1'
+destination:
+  plugin: 'entity:node'
+  default_bundle: training
+  overwrite_properties:
+    - field_content_type_source
+    - title
+    - field_diplome
+    - field_type_diplome
+    - field_graduate_school
+    - field_responsible
+    - field_parcour
+
+migration_dependencies:
+  require:
+    - master_nodes
+

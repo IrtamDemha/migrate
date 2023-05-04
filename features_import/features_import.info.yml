@@ -1,0 +1,9 @@
+name: features_parser
+type: module
+description: 'parser features'
+core: 8.x
+package: Custom
+core_incompatible: false
+dependencies:
+  - migrate_manifest
+  - migrate_plus

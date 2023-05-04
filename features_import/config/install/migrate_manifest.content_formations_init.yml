@@ -1,0 +1,38 @@
+# cours                     (SPHINX/programme) (TC : course)
+- courses_master_nodes
+
+# modules                   (SPHINX/programme) (TC : program)
+- module_master
+
+# link cours to module      (SPHINX/programme) (TC : program)
+- module_master_update
+
+# semestre                  (SPHINX/programme) (TC : program)
+- program_master
+
+# link cours to semestre    (SPHINX/programme) (TC : program)
+- program_master_update
+
+# paragraphs                (COPERNIC)         (P : vouchers )
+- master_lpj_paragraph
+
+# lpg nodes fr              (COPERNIC)         (TC : vouchers)
+- master_lpj_nodes
+
+# nodes                     (COPERNIC)         (TC : parcour)
+- master_nodes
+
+# texte from                (SPHINX/infos_elf) (TC : parcour)
+- master_texte_paragraph
+
+#  link semestre to node    (SPHINX/programme) (TC : parcour)
+- master_nodes_update
+
+# mention                   (COPERNIC)         (TC : training)
+- mentions_nodes
+
+#  mention texte            (SPHINX/infos_mentions) (TC : training)
+- mentions_nodes_update
+
+# Archive files
+- formation_archive

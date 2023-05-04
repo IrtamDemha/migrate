@@ -1,0 +1,46 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: module_master_update
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  directory: private://sphinx_fr/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - code_EN
+    - bloc_UE
+    - code_bloc
+  keys:
+    code_EN:
+      type: string
+    code_bloc:
+      type: string
+process:
+  nid:
+    plugin: migration_lookup
+    migration: module_master
+    source: code_bloc
+
+  cid:
+    plugin: migration_lookup
+    migration: courses_master_nodes
+    source: code_EN
+
+  field_courses:
+    plugin: fieldlookup
+    field: field_courses
+    type: node
+    source:
+      - '@nid'
+      - '@cid'
+
+destination:
+  plugin: 'entity:node'
+  bundle: program
+  overwrite_properties:
+    - field_courses

@@ -1,0 +1,37 @@
+# cours
+- courses_master_nodes_en
+
+# modules
+- module_master_en
+
+
+# semestre
+- program_master_en
+
+
+
+# paragraphs
+#- master_lpj_paragraph_en
+
+# lpg nodes fr
+- master_lpj_nodes_en
+# nodes
+- master_nodes_en
+
+# texte from xls
+- master_texte_paragraph_en
+
+
+# mention
+- mentions_nodes_en
+
+#  mention texte
+- mentions_nodes_update_en
+
+# Archive files
+- formation_archive_en
+# lando drush mr  mentions_nodes_update &&  lando drush mr  mentions_nodes && lando drush mr  master_nodes_update && lando drush mr  master_nodes  && lando drush mr  master_lpj_paragraph && lando drush mr  program_master_update && lando drush mr  program_master_update  &&  lando drush mr  program_master_update &&  lando drush mr  program_master &&  lando drush mr  courses_master_nodes &&
+
+
+#  docker-compose exec www bin/drush mr   courses_master_nodes && docker-compose exec www bin/drush mr   program_master &&  docker-compose exec www bin/drush mr   program_master_update  &&  docker-compose exec www bin/drush mr   master_lpj_paragraph  &&  docker-compose exec www bin/drush mr   master_nodes &&  docker-compose exec www bin/drush mr   master_texte_paragraph  &&  docker-compose exec www bin/drush mr   master_nodes_update &&  docker-compose exec www bin/drush mr   mentions_nodes && docker-compose exec www bin/drush mr   mentions_nodes_update
+

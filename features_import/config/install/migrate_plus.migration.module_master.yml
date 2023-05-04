@@ -1,0 +1,52 @@
+langcode: fr
+status: true
+dependencies: {  }
+id: module_master
+migration_tags: null
+migration_group: null
+label: 'Import courses'
+source:
+  plugin: customspreadSheet
+  constants:
+    related_cycle: 'training'
+  directory: private://sphinx_fr/input/
+  worksheet: programme
+  origin: A2
+  header_row: 1
+  columns:
+    - bloc_UE
+    - code_bloc
+
+  keys:
+    code_bloc:
+      type: string
+
+process:
+  title:
+    plugin: substr_and_elipsis
+    source: bloc_UE
+    start: 0
+    length: 254
+
+  field_external_id: code_bloc
+  field_content_type_source: constants/related_cycle
+  status:
+    plugin: default_value
+    default_value: '1'
+  moderation_state:
+    plugin: default_value
+    default_value: 'published'
+  uid:
+    plugin: default_value
+    default_value: '1'
+
+
+destination:
+  plugin: 'entity:node'
+  default_bundle: program
+  overwrite_properties:
+    - field_content_type_source
+    - title
+
+
+
